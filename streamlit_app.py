@@ -83,6 +83,5 @@ if st.button("Predict Risk Level"):
 
     # Display outputs
     st.write("### 🔍 Model Outputs")
-    st.write("Raw probabilities:", probs.tolist())
     st.write("Predicted class index:", pred_class)
     st.write("Final Risk Level Prediction:", f"**{risk_label.upper()}**")
