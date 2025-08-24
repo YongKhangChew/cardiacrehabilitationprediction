@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import joblib
+from tensorflow.keras.models import load_model
 
 # Load your trained model
 model = load_model("nn_model.h5")
