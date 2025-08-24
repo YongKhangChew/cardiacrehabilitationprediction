@@ -2,8 +2,8 @@ import streamlit as st
 import pandas as pd
 import joblib
 
-# Load your trained model (replace with your actual file)
-# model = joblib.load("model.pkl")
+# Load your trained model
+model = load_model("nn_model.h5")
 
 # Encoders mapping dictionary (from your LabelEncoder output)
 encoders = {
