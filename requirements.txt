@@ -5,3 +5,5 @@ joblib
 xgboost
 matplotlib
 seaborn
+numpy
+tensorflow
