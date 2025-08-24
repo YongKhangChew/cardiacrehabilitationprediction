@@ -1,10 +1,12 @@
 import streamlit as st
 import pandas as pd
 import joblib
+import tensorflow as tf
 from tensorflow.keras.models import load_model
 
 # Load your trained model
-model = load_model("nn_model.h5")
+#model = load_model("nn_model.h5")
+model = tf.keras.models.load_model("nn_model.h5")
 
 # Encoders mapping dictionary (from your LabelEncoder output)
 encoders = {
@@ -26,7 +28,13 @@ encoders = {
 }
 
 # Reverse mapping for Risk Level (to display prediction nicely)
-risk_level_reverse = {v: k for k, v in encoders["Risk Level"].items()}
+#risk_level_reverse = {v: k for k, v in encoders["Risk Level"].items()}
+risk_level_reverse = {
+    0: "high",
+    1: "low",
+    2: "moderate",
+    3: "unknown"
+}
 
 st.title("Cardiac Rehab Risk Prediction")
 
@@ -60,7 +68,17 @@ input_df = pd.DataFrame([user_data])
 
 # Prediction button
 if st.button("Predict Risk Level"):
-    pred = model.predict(input_df)[0]
-    risk_label = risk_level_reverse[int(pred)]
+    # Get raw model probabilities
+    probs = model.predict(user_input, verbose=0)
 
-    st.success(f"**Predicted Risk Level:** {risk_label} ({pred})")
+    # Take the class with max probability
+    pred_class = int(np.argmax(probs, axis=1)[0])
+
+    # Map back to label
+    risk_label = risk_level_reverse[pred_class]
+
+    # Display outputs
+    st.write("### 🔍 Model Outputs")
+    st.write("Raw probabilities:", probs.tolist())
+    st.write("Predicted class index:", pred_class)
+    st.write("Final Risk Level Prediction:", f"**{risk_label.upper()}**")
