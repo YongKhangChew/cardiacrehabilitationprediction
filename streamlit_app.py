@@ -59,8 +59,7 @@ input_df = pd.DataFrame([user_data])
 
 # Prediction button
 if st.button("Predict Risk Level"):
-    # pred = model.predict(input_df)[0]  # Uncomment when model is ready
-    pred = 0  # Dummy example (high)
+    pred = model.predict(input_df)[0]
     risk_label = risk_level_reverse[pred]
 
     st.success(f"**Predicted Risk Level:** {risk_label} ({pred})")
