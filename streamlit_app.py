@@ -1,33 +1,66 @@
 import streamlit as st
 import pandas as pd
-import numpy as np
-from tensorflow.keras.models import load_model
 import joblib
 
-# Load trained model
-model = load_model("nn_model.h5")
+# Load your trained model (replace with your actual file)
+# model = joblib.load("model.pkl")
 
-# If you saved features.pkl earlier, load it
-try:
-    features = joblib.load("features.pkl")
-except:
-    features = [f"Feature_{i}" for i in range(7)]  # fallback
+# Encoders mapping dictionary (from your LabelEncoder output)
+encoders = {
+    "ROM": {"abnormal": 0, "normal": 1, "unknown": 2},
+    "Balance in Sitting and Standing": {"no": 0, "unknown": 1, "yes": 2},
+    "Functional Activity": {"assisted": 0, "independent": 1, "unknown": 2},
+    "Walking": {"dependent": 0, "independent": 1, "unknown": 2},
+    "Gait": {"abnormal": 0, "normal": 1, "unknown": 2},
+    "Posture": {"abnormal": 0, "normal": 1, "unknown": 2},
+    "Risk Level": {"high": 0, "low": 1, "moderate": 2, "unknown": 3},
+    "RISK  - Risk Type": {
+        "high": 0,
+        "low": 1,
+        "low to moderate": 2,
+        "moderate": 3,
+        "moderate to high": 4,
+        "unknown": 5,
+    },
+}
 
-st.title("🔮 Risk Level Prediction (Neural Network)")
+# Reverse mapping for Risk Level (to display prediction nicely)
+risk_level_reverse = {v: k for k, v in encoders["Risk Level"].items()}
 
-st.write("Enter the values for each feature to predict risk level:")
+st.title("Cardiac Rehab Risk Prediction")
 
-# Collect user input
-user_input = {}
-for col in features:
-    user_input[col] = st.number_input(f"{col}", value=0.0)
+st.write(
+    """
+    This app predicts the **Risk Level** of a patient based on their 
+    health assessment features. Each categorical input is encoded numerically
+    — the mappings are shown below for clarity.
+    """
+)
 
-# Convert to DataFrame
-input_df = pd.DataFrame([user_input])
+# Sidebar to show the mappings
+st.sidebar.header("Feature Bindings (Encodings)")
+for feature, mapping in encoders.items():
+    st.sidebar.subheader(feature)
+    for k, v in mapping.items():
+        st.sidebar.write(f"{k} → {v}")
 
-if st.button("Predict"):
-    # Predict with NN
-    prediction = model.predict(input_df)
-    pred_class = np.argmax(prediction, axis=1)[0]
+# Collect user inputs
+st.header("Enter Patient Information")
 
-    st.success(f"✅ Predicted Risk Level: **{pred_class}**")
+user_data = {}
+for feature, mapping in encoders.items():
+    if feature == "Risk Level":  # this is the output, skip input
+        continue
+    choice = st.selectbox(f"{feature}", list(mapping.keys()))
+    user_data[feature] = mapping[choice]
+
+# Convert input to DataFrame
+input_df = pd.DataFrame([user_data])
+
+# Prediction button
+if st.button("Predict Risk Level"):
+    # pred = model.predict(input_df)[0]  # Uncomment when model is ready
+    pred = 0  # Dummy example (high)
+    risk_label = risk_level_reverse[pred]
+
+    st.success(f"**Predicted Risk Level:** {risk_label} ({pred})")
