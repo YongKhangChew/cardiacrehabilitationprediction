@@ -68,6 +68,9 @@ input_df = pd.DataFrame([user_data])
 
 # Prediction button
 if st.button("Predict Risk Level"):
+    # Convert input_df to numpy with correct shape
+    user_input = input_df.to_numpy()
+
     # Get raw model probabilities
     probs = model.predict(user_input, verbose=0)
 
